@@ -1,10 +1,18 @@
 import Fastify from 'fastify';
+import cors from '@fastify/cors';
 import { GoogleTasksProvider } from './infrastructure/providers/GoogleTasksProvider.js';
 import { GetTasksUseCase } from './application/GetTasksUseCase.js';
 import { TaskController } from './presentation/controllers/TaskController.js';
 
 
 const app = Fastify({ logger: true });
+
+// Registrar e configurar o CORS
+app.register(cors, {
+  origin: ['http://localhost:4200'], // Libera acesso apenas para o Angular local
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'], // Libera envio do token de autorização
+});
 
 // 1. Instanciamos a Infraestrutura (o mundo externo)
 const googleTasksProvider = new GoogleTasksProvider();
