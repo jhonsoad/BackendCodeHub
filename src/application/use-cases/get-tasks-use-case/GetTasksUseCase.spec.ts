@@ -1,11 +1,14 @@
 import { describe, expect, it } from '@jest/globals';
-import type { Task } from '../domain/entities/Task.js';
-import type { ITasksProvider } from '../domain/interfaces/ITasksProvider.js';
+import type { CreateTaskDTO, Task } from '../../../domain/entities/Task.js';
+import type { ITasksProvider } from '../../../domain/interfaces/ITasksProvider.js';
 import { GetTasksUseCase } from './GetTasksUseCase.js';
 
 
 // 1. Criamos um Mock (Fake) da interface do domínio
 class TasksProviderMock implements ITasksProvider {
+  createTask(accessToken: string, taskData: CreateTaskDTO): Promise<Task> {
+    throw new Error('Method not implemented.');
+  }
   public shouldFail = false;
 
   async fetchTasks(accessToken: string): Promise<Task[]> {

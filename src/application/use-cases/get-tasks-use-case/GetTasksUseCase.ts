@@ -1,5 +1,5 @@
-import type { Task } from "../domain/entities/Task.js";
-import type { ITasksProvider } from "../domain/interfaces/ITasksProvider.js";
+import type { Task } from "../../../domain/entities/Task.js";
+import type { ITasksProvider } from "../../../domain/interfaces/ITasksProvider.js";
 
 
 export class GetTasksUseCase {
