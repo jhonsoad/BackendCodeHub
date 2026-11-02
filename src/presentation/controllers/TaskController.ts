@@ -47,6 +47,9 @@ export class TaskController {
     }
 
     const accessToken = authHeader.split(' ')[1];
+    if (!accessToken) {
+      return reply.status(401).send({ error: 'Acesso negado. Token ausente ou inválido.' });
+    }
     const taskData = request.body as { title: string; notes?: string };
 
     const newTask = await this.createTaskUseCase.execute(accessToken, taskData);
