@@ -1,6 +1,11 @@
 export interface Task {
-  id: string;
+  id?: string | undefined;
   title: string;
-  notes?: string;
+  notes?: string | undefined;
   status: string;
+}
+
+export interface CreateTaskDTO {
+  title: string;
+  notes?: string | undefined;
 }
