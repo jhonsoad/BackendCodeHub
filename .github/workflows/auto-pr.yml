@@ -1,0 +1,58 @@
+name: Test and Auto Create Pull Request
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  unit-tests:
+    name: Run Unit Tests & Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '26'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Jest tests
+        run: npm run test -- --ci --maxWorkers=2
+
+      - name: Build Project (TypeScript Compilation)
+        run: npm run build
+
+  create-pr:
+    name: Create PR to main
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_EXISTS=$(gh pr list --head "${GITHUB_REF_NAME}" --base main --json url --jq 'length')
+
+          if [ "$PR_EXISTS" -eq "0" ]; then
+            gh pr create \
+              --base main \
+              --head "${GITHUB_REF_NAME}" \
+              --title "Automated PR: ${GITHUB_REF_NAME}" \
+              --body "Este Pull Request foi validado e criado automaticamente após testes unitários e compilação TypeScript bem-sucedidos na branch **${GITHUB_REF_NAME}**."
+            echo "Pull Request criado com sucesso!"
+          else
+            echo "Já existe um Pull Request aberto para a branch ${GITHUB_REF_NAME}."
+          fi
