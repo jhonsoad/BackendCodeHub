@@ -2,9 +2,37 @@ import type { CreateTaskDTO, Task } from "../../domain/entities/Task.js";
 import type { ITasksProvider } from "../../domain/interfaces/ITasksProvider.js";
 
 export class GoogleTasksProvider implements ITasksProvider {
-  fetchTasks(accessToken: string): Promise<Task[]> {
-    throw new Error("Method not implemented.");
+  async fetchTasks(accessToken: string): Promise<Task[]> {
+    const url = "https://tasks.googleapis.com/tasks/v1/lists/@default/tasks";
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = (await response.json().catch(() => ({}))) as {
+        error?: { message?: string };
+      };
+      const message =
+        errorData.error?.message || `HTTP ${response.status} ${response.statusText}`;
+      throw new Error(`Erro ao buscar tarefas no Google: ${message}`);
+    }
+
+    const data = (await response.json()) as { items?: any[] };
+    const items = data.items || [];
+
+    return items.map((item: any) => ({
+      id: item.id,
+      title: item.title,
+      notes: item.notes,
+      status: item.status,
+    }));
   }
+
   async createTask(
     accessToken: string,
     taskData: CreateTaskDTO,
@@ -24,13 +52,15 @@ export class GoogleTasksProvider implements ITasksProvider {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = (await response.json().catch(() => ({}))) as {
+        error?: { message?: string };
+      };
       throw new Error(
-        `Erro ao criar tarefa no Google: ${errorData.error?.message || "Erro desconhecido"}`,
+        `Erro ao criar tarefa no Google: ${errorData.error?.message || `HTTP ${response.status} ${response.statusText}`}`,
       );
     }
 
-    const item = await response.json();
+    const item = (await response.json()) as any;
 
     return {
       id: item.id,
