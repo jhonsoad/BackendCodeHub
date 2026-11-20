@@ -4,19 +4,6 @@ Este documento descreve a estratégia e as alternativas de arquitetura para a au
 
 ---
 
-## 📌 Contexto & Diagnóstico
-
-### Por que o deploy do Frontend (S3 + CloudFront) não serve para o Backend?
-O workflow herdado do frontend enviava arquivos HTML/JS/CSS estáticos gerados pelo Angular (`dist/.../browser`) para um bucket **AWS S3** e invalidava o cache do **CloudFront** (CDN).
-
-Diferente de um SPA (Single Page Application), a API **BackendCodeHub**:
-- É uma aplicação Node.js desenvolvida com **Fastify** e **TypeScript**.
-- Exige um processo em execução contínua escutando portas de rede (ex: porta `3000`).
-- Processa requisições HTTP dinâmicas, valida tokens OAuth2 e interage com APIs externas (Google Tasks).
-- Necessita de um runtime de servidor contínuo (contêiner/VM) ou um ambiente de execução Serverless.
-
----
-
 ## 🗺️ Visão Geral das Estratégias
 
 ```mermaid

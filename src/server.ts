@@ -9,7 +9,10 @@ const app = Fastify({ logger: true });
 
 // Registrar e configurar o CORS
 app.register(cors, {
-  origin: ["http://localhost:4200"], // Libera acesso apenas para o Angular local
+  origin: [
+    "http://localhost:4200",
+    "https://d2ad3u3d9d20vp.cloudfront.net",
+  ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"], // Libera envio do token de autorização
 });
@@ -34,8 +37,9 @@ app.post("/tasks", taskController.create.bind(taskController));
 
 const start = async () => {
   try {
-    await app.listen({ port: 3000 });
-    console.log("🚀 Servidor rodando em http://localhost:3000");
+    const port = Number(process.env.PORT) || 3000;
+    await app.listen({ port, host: "0.0.0.0" });
+    console.log(`🚀 Servidor rodando na porta ${port}`);
   } catch (err) {
     app.log.error(err);
     process.exit(1);
